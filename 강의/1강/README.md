@@ -387,6 +387,98 @@ Fetching JDBC Connection from DataSource
 
 ## JdbcTemplate - 이름 지정 파라미터 1
 
+### 순서대로 바인딩
+
+#### 기존 코드
+
+```java
+String sql = "update item set item_name=?, price=?, quantity=? where id=?";
+template.update(sql,
+        updateParam.getItemName(),
+        updateParam.getPrice(),
+        updateParam.getQuantity(),
+        itemId
+);
+```
+
+* 여기서는 `itemName`, `price`, `quantity`가 SQL에 있는 `?` 에 순서대로 바인딩 된다.
+* 따라서 순서만 잘 지키면 문제가 될 것은 없다. 그런데 문제는 변경시점에 발생한다.
+
+#### 누군가 순서 변경
+
+```java
+String sql = "update item set item_name=?, quantity=?, price=? where id=?";
+template.update(sql,
+        updateParam.getItemName(),
+        updateParam.getPrice(),
+        updateParam.getQuantity(),
+        itemId
+);
+```
+
+* 결과적으로 `price`와 `quantity`가 바뀌는 매우 심각한 문제가 발생한다.
+* 이럴일이 없을 것 같지만, 실무에서는 파라미터가 10~20개가 넘어가는 일도 아주 많다.
+* 그래서 미래에 필드를 추가하거나, 수정하면서 이런 문제가 충분히 발생할 수 있다.
+
+#### 명심하자
+
+> 개발을 할 때는 코드를 몇줄 줄이는 편리함도 중요하지만,
+> 모호함을 제거해서 코드를 명확하게 만드는 것이 유지보수 관점에서 매우 중요하다.
+
+### 이름 지정 바인딩
+
+`JdbcTemplate`은 이런 문제를 보완하기 위해 `NamedParameterJdbcTemplate`라는 이름을 지정해서 파라미터를 바인딩 하는 기능을 제공한다.
+
+#### JdbcTemplateItemRepository V2
+
+```java
+/**
+ * NamedParameterJdbcTemplate
+ * SqlParameterSource
+ * - BeanPropertySqlParameterSource
+ * - MapSqlParameterSource
+ * Map
+ * <p>
+ * BeanPropertyRowMapper
+ */
+@Slf4j
+@Repository
+public class JdbcTemplateItemRepositoryV2 implements ItemRepository {
+    private final NamedParameterJdbcTemplate template;
+
+    public JdbcTemplateItemRepositoryV2(
+            DataSource dataSource
+    ) {
+        this.template = new NamedParameterJdbcTemplate(dataSource);
+    }
+}
+```
+
+* `this.template = new NamedParameterJdbcTemplate(dataSource)`
+    * `NamedParameterJdbcTemplate`도 내부에 `dataSource`가 필요하다.
+    * `JdbcTemplateItemRepositoryV2` 생성자를 보면 의존관계 주입은 `dataSource`를 받고 내부에서 `NamedParameterJdbcTemplate`을 생성해서 가지고 있다.
+    * 스프링에서는 `JdbcTemplate`관련 기능을 사용할 때 관례상 이 방법을 많이 사용한다.
+* 물론 `NamedParameterJdbcTemplate`을 스프링 빈으로 직접 등록하고 주입받아도 된다.
+
+#### save()
+
+```java
+@Override
+public Item save(Item item) {
+    String sql = "insert into item(item_name, price, quantity) values(:itemName, :price, :quantity)";
+
+    SqlParameterSource param = new BeanPropertySqlParameterSource(item);
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+    template.update(sql, param, keyHolder);
+
+    item.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+    return item;
+}
+```
+
+* SQL에서 다음과 같이 `?` 대신에 `:파라미터이름`을 받는 것을 확인할 수 있다.
+* 추가로 `NamedParameterJdbcTemplate`은 데이터베이스가 생성해주는 키를 매우 쉽게 조회하는 기능도 제공해준다
+
 ## JdbcTemplate - 이름 지정 파라미터 2
 
 ## JdbcTemplate - 이름 지정 파라미터 3
