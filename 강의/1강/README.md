@@ -636,4 +636,91 @@ Mapping column 'QUANTITY' to property 'quantity' of type 'java.lang.Integer'
 
 ## JdbcTemplate - SimpleJdbcInsert
 
+### SimpleJdbcInsert
+
+#### JdbcTemplateItemRepository V3
+
+```java
+/**
+ * SimpleJdbcInsert
+ */
+@Slf4j
+@Repository
+public class JdbcTemplateItemRepositoryV3 implements ItemRepository {
+    private final NamedParameterJdbcTemplate template;
+    private final SimpleJdbcInsert jdbcInsert;
+
+    public JdbcTemplateItemRepositoryV3(
+            DataSource dataSource
+    ) {
+        this.template = new NamedParameterJdbcTemplate(dataSource);
+        this.jdbcInsert = new SimpleJdbcInsert(dataSource)
+                .withTableName("item")
+                .usingGeneratedKeyColumns("id")
+                .usingColumns("item_name", "price", "quantity"); // 생략 가능
+    }
+
+    @Override
+    public Item save(Item item) {
+        SqlParameterSource param = new BeanPropertySqlParameterSource(item);
+        Number key = jdbcInsert.executeAndReturnKey(param);
+        item.setId(key.longValue());
+        
+        return item;
+    }
+    
+    // ...
+}
+```
+
+* `this.jdbcInsert = new SimpleJdbcInsert(dataSource)`
+* 생성자를 보면 의존관계 주입은 `dataSource`를 받고 내부에서 `SimpleJdbcInsert`을 생성해서 가지고 있다.
+    * 스프링에서는 JdbcTemplate 관련 기능을 사용할 때 관례상 이 방법을 많이 사용한다.
+* 물론 `SimpleJdbcInsert`을 스프링 빈으로 직접 등록하고 주입받아도 된다.
+
+#### SimpleJdbcInsert
+
+```java
+this.jdbcInsert = new SimpleJdbcInsert(dataSource)
+        .withTableName("item")
+        .usingGeneratedKeyColumns("id")
+        .usingColumns("item_name", "price", "quantity"); // 생략 가능
+```
+
+* `withTableName`
+    * 데이터를 저장할 테이블 명을 지정한다.
+* `usingGeneratedKeyColumns`
+    * key 를 생성하는 PK 컬럼 명을 지정한다.
+* `usingColumns`
+    * INSERT SQL에 사용할 컬럼을 지정한다. 특정 값만 저장하고 싶을 때 사용한다.
+    * 생략할 수 있다.
+
+`SimpleJdbcInsert`는 생성 시점에 데이터베이스 테이블의 메타 데이터를 조회한다.
+따라서 어떤 컬럼이 있는지 확인 할 수 있으므로 `usingColumns`을 생략할 수 있다.
+만약 특정 컬럼만 지정해서 저장하고 싶다면 `usingColumns`를 사용하면 된다.
+
+#### save()
+
+```java
+@Override
+public Item save(Item item) {
+    SqlParameterSource param = new BeanPropertySqlParameterSource(item);
+    Number key = jdbcInsert.executeAndReturnKey(param);
+    item.setId(key.longValue());
+    
+    return item;
+}
+```
+
+### 결과 로그
+
+```
+The following parameters are used for call INSERT INTO item (item_name, price, quantity) VALUES(?, ?, ?) 
+with: [
+  org.springframework.jdbc.core.SqlParameterValue@7401ba83, 
+  org.springframework.jdbc.core.SqlParameterValue@21376c3, 
+  org.springframework.jdbc.core.SqlParameterValue@27c3f35d
+]
+```
+
 ## JdbcTemplate 기능 정리
