@@ -38,6 +38,44 @@ JPA는 스프링 만큼이나 방대하고, 학습해야할 분량도 많다.
 
 ## JPA 설정
 
+### 라이브러리 추가
+
+![img.png](img.png)
+
+#### build.gradle
+
+```gradle
+dependencies {
+    // JAP, 스프링 데이터 JPA 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+}
+```
+
+* `hibernate-core`
+    * JPA 구현체인 하이버네이트 라이브러리
+* `jakarta.persistence-api`
+    * JPA 인터페이스
+* `spring-data-jpa`
+    * 스프링 데이터 JPA 라이브러리
+* `spring-boot-starter-jdbc`
+    * 이전에 추가했던 JDBC 라이브러리도 함께 추가된다.
+    * 이는 MyBatis도 동일하다.
+
+#### application.properties
+
+```properties
+# JPA
+logging.level.org.hibernate.SQL = DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder = TRACE
+```
+
+* `org.hibernate.SQL = DEBUG`
+    * 하이버네이트가 생성하고 실행하는 SQL을 확인할 수 있다.
+* `org.hibernate.type.descriptor.sql.BasicBinder = TRACE`
+    * SQL에 바인딩 되는 파라미터를 확인할 수 있다.
+* `spring.jpa.show-sql = true`
+    * 이 설정은 System.out 콘솔을 통해서 SQL이 출력된다. 따라서 이 설정은 권장하지는 않는다.
+
 ## JPA 적용 1 - 개발
 
 ## JPA 적용 2 - 리포지토리 분석
