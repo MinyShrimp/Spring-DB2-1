@@ -19,11 +19,20 @@ repositories {
 }
 
 dependencies {
+    // Web, Thymeleaf, Test
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // JdbcTemplate
+    implementation 'org.springframework.book:spring-boot-starter-jdbc'
+
+    // H2 데이터베이스
+    runtimeOnly 'com.h2database:h2'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // 테스트에서 lombok 사용
     testCompileOnly 'org.projectlombok:lombok'
