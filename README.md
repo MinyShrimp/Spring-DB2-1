@@ -2,11 +2,17 @@
 
 * 강의 : https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-db-2/dashboard
 * 깃헙
-    *
-
-## 프로젝트 세팅
+    * https://github.com/MinyShrimp/Spring-DB2-1
 
 ## 데이터 접근 기술 - 시작
+
+* 강의 소개
+* 데이터 접근 기술 진행 방식 소개
+* 프로젝트 설정과 메모리 저장소
+* 프로젝트 구조 설명 1 - 기본
+* 프로젝트 구조 설명 2 - 설정
+* 프로젝트 구조 설명 3 - 테스트
+* 데이터베이스 테이블 생성
 
 ## 데이터 접근 기술 - 스프링 JdbcTemplate
 
