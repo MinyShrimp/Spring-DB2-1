@@ -119,4 +119,80 @@ public interface SpringDataJpaItemRepository extends JpaRepository<Item, Long> {
 
 ## 스프링 데이터 JPA 적용 1
 
+### 설정
+
+#### build.gradle
+
+```gradle
+dependencies {
+    // JPA, 스프링 데이터 JPA 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+}
+```
+
+### 예제
+
+#### SpringDataJpaItemRepository
+
+```java
+public interface SpringDataJpaItemRepository extends JpaRepository<Item, Long> {
+
+    // Item.itemName Like '%:itemName%'
+    List<Item> findByItemNameLike(String itemName);
+
+    // Item.price <= :price
+    List<Item> findByPriceLessThanEqual(Integer price);
+
+    // 쿼리 메서드 ( 아래 메서드와 동일한 기능 수행 )
+    List<Item> findByItemNameLikeAndPriceLessThanEqual(String itemName, Integer price);
+
+    // 쿼리 직접 실행
+    @Query("select i from Item i where i.itemName like :itemName and i.price <= :price")
+    List<Item> findItems(
+            @Param("itemName") String itemName,
+            @Param("price") Integer price
+    );
+}
+```
+
+* 스프링 데이터 JPA가 제공하는 `JpaRepository` 인터페이스를 인터페이스 상속 받으면 기본적인 CRUD 기능을 사용할 수 있다.
+* 그런데 이름으로 검색하거나, 가격으로 검색하는 기능은 공통으로 제공할 수 있는 기능이 아니다.
+    * 따라서 쿼리 메서드 기능을 사용하거나 `@Query`를 사용해서 직접 쿼리를 실행하면 된다.
+* 동적 쿼리를 사용하면 좋겠지만, 스프링 데이터 JPA는 동적 쿼리에 약하다.
+* 그리고 이 문제는 이후에 `Querydsl`에서 동적 쿼리로 깔끔하게 해결하겠다.
+
+#### findAll()
+
+* 코드에는 보이지 않지만 JpaRepository 공통 인터페이스가 제공하는 기능이다.
+* 모든 Item 을 조회한다.
+* JPQL: `select i from Item i`
+
+#### findByItemNameLike()
+
+* 이름 조건으로만 검색할 때 사용하는 쿼리 메서드이다.
+* JPQL: `select i from Item i where i.name like ?`
+
+#### findByPriceLessThanEqual()
+
+* 가격 조건으로만 검색할 때 사용하는 쿼리 메서드이다.
+* JPQL: `select i from Item i where i.price <= ?`
+
+#### findByItemNameLikeAndPriceLessThanEqual()
+
+* 이름과 가격 조건을 검색할 때 사용하는 쿼리 메서드이다.
+* JPQL: `select i from Item i where i.itemName like ? and i.price <= ?`
+
+#### findItems()
+
+메서드 이름으로 쿼리를 실행하는 기능은 다음과 같은 단점이 있다.
+
+1. 조건이 많으면 메서드 이름이 너무 길어진다.
+2. 조인 같은 복잡한 조건을 사용할 수 없다.
+    * 메서드 이름으로 쿼리를 실행하는 기능은 간단한 경우에는 매우 유용하지만,
+      복잡해지면 직접 JPQL 쿼리를 작성하는 것이 좋다.
+
+* 쿼리를 직접 실행하려면 `@Query` 애노테이션을 사용하면 된다.
+* 쿼리를 직접 실행할 때는 파라미터를 명시적으로 바인딩 해야 한다.
+    * 파라미터 바인딩은 `@Param("itemName")` 애노테이션을 사용하고, 애노테이션의 값에 파라미터 이름을 주면 된다.
+
 ## 스프링 데이터 JPA 적용 2

@@ -46,7 +46,7 @@ JPA는 스프링 만큼이나 방대하고, 학습해야할 분량도 많다.
 
 ```gradle
 dependencies {
-    // JAP, 스프링 데이터 JPA 추가
+    // JPA, 스프링 데이터 JPA 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 }
 ```
