@@ -294,3 +294,12 @@ public class SpringDataJpaConfig {
 @SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
 public class SpringDb2Application { ... }
 ```
+
+## 정리
+
+* 스프링 데이터 JPA의 대표적인 기능을 알아보았다.
+* 스프링 데이터 JPA는 이 외에도 정말 수 많은 편리한 기능을 제공한다.
+    * 심지어 우리가 어렵게 사용하는 **페이징**을 위한 기능들도 제공한다.
+* 스프링 데이터 JPA는 단순히 편리함을 넘어서 많은 개발자들이 똑같은 코드로 중복 개발하는 부분을 개선해준다.
+* 개인적으로 스프링 데이터 JPA는 실무에서 기본으로 선택하는 기술이다.
+* 스프링 데이터 JPA에 대한 자세한 내용은 **실전! 스프링 데이터 JPA 강의**를 참고하자.
