@@ -583,6 +583,57 @@ item.setPrice(rs.getInt("price"));
 
 ## JdbcTemplate - 이름 지정 파라미터 3
 
+### JdbcTemplateV2Config
+
+```java
+@Configuration
+@RequiredArgsConstructor
+public class JdbcTemplateV2Config {
+    private final DataSource dataSource;
+
+    @Bean
+    public ItemService itemService() {
+        return new ItemServiceV1(itemRepository());
+    }
+
+    @Bean
+    public ItemRepository itemRepository() {
+        return new JdbcTemplateItemRepositoryV2(dataSource);
+    }
+}
+```
+
+### MainApplication
+
+```java
+//@Import(JdbcTemplateV1Config.class)
+@Import(JdbcTemplateV2Config.class)
+@SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
+public class SpringDb2Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringDb2Application.class, args);
+    }
+
+    @Bean
+    @Profile("local")
+    public TestDataInit testDataInit(
+            ItemRepository itemRepository
+    ) {
+        return new TestDataInit(itemRepository);
+    }
+}
+```
+
+### BeanPropertyRowMapper Log
+
+```
+Mapping column 'ID' to property 'id' of type 'java.lang.Long'
+Mapping column 'ITEM_NAME' to property 'itemName' of type 'java.lang.String'
+Mapping column 'PRICE' to property 'price' of type 'java.lang.Integer'
+Mapping column 'QUANTITY' to property 'quantity' of type 'java.lang.Integer'
+```
+
 ## JdbcTemplate - SimpleJdbcInsert
 
 ## JdbcTemplate 기능 정리
