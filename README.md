@@ -1,6 +1,6 @@
 # 스프링 DB 2편 - 데이터 접근 활용 기술
 
-* 강의 : https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-db-2/dashboard
+* 강의 : [김영한님의 스프링 DB 2편 - 데이터 접근 활용 기술](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-db-2/dashboard)
 * 깃헙
     * https://github.com/MinyShrimp/Spring-DB2-1
 
