@@ -1,6 +1,7 @@
 package hello.springdb2.domain;
 
 import hello.springdb2.dto.ItemUpdateDto;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Item {
     private Long id;
     private String itemName;

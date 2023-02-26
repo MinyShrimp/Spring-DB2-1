@@ -5,9 +5,13 @@ import hello.springdb2.dto.ItemUpdateDto;
 import hello.springdb2.example.memory.repository.MemoryItemRepository;
 import hello.springdb2.repository.ItemRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
@@ -16,13 +20,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class ItemRepositoryTest {
     @Autowired
+    PlatformTransactionManager transactionManager;
+    TransactionStatus status;
+
+    @Autowired
     private ItemRepository itemRepository;
+
+    @BeforeEach
+    void beforeEach() {
+        // 트랜잭션 시작
+        this.status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+    }
 
     @AfterEach
     void afterEach() {
-        if (itemRepository instanceof MemoryItemRepository) {
-            ((MemoryItemRepository) itemRepository).clearStore();
+        // 메모리 Repository 인 경우 제한적으로 사용
+        if (this.itemRepository instanceof MemoryItemRepository) {
+            ((MemoryItemRepository) this.itemRepository).clearStore();
         }
+
+        // 트랜잭션 롤백
+        this.transactionManager.rollback(status);
     }
 
     @Test
@@ -35,10 +53,7 @@ public class ItemRepositoryTest {
 
         // then
         Item findItem = itemRepository.findById(savedItem.getId()).orElseThrow();
-        assertThat(findItem.getId()).isEqualTo(savedItem.getId());
-        assertThat(findItem.getItemName()).isEqualTo(savedItem.getItemName());
-        assertThat(findItem.getPrice()).isEqualTo(savedItem.getPrice());
-        assertThat(findItem.getQuantity()).isEqualTo(savedItem.getQuantity());
+        assertThat(findItem).isEqualTo(savedItem);
     }
 
     @Test

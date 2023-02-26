@@ -72,6 +72,77 @@ spring.datasource.username = sa
 
 ## 테스트 - 데이터 롤백
 
+### 트랜잭션과 롤백 전략
+
+이때 도움이 되는 것이 바로 트랜잭션이다.
+
+* 테스트가 끝나고 나서 트랜잭션을 강제로 롤백해버리면 데이터가 깔끔하게 제거된다.
+* 테스트를 하면서 데이터를 이미 저장했는데, 중간에 테스트가 실패해서 롤백을 호출하지 못해도 괜찮다.
+* 트랜잭션을 커밋하지 않았기 때문에 데이터베이스에 해당 데이터가 반영되지 않는다.
+* 이렇게 트랜잭션을 활용하면 테스트가 끝나고 나서 데이터를 깔끔하게 원래 상태로 되돌릴 수 있다.
+* 예를 들어서 다음 순서와 같이 각각의 테스트 실행 직전에 트랜잭션을 시작하고, 각각의 테스트 실행 직후에 트랜잭션을 롤백해야 한다.
+* 그래야 다음 테스트에 데이터로 인한 영향을 주지 않는다.
+
+```
+1. 트랜잭션 시작
+2. 테스트 A 실행
+3. 트랜잭션 롤백
+
+4. 트랜잭션 시작
+5. 테스트 B 실행
+6. 트랜잭션 롤백
+```
+
+테스트는 각각의 테스트 실행 전 후로 동작하는 @BeforeEach , @AfterEach 라는 편리한 기능을 제공한다.
+테스트에 트랜잭션과 롤백을 적용하기 위해 다음 코드를 추가하자.
+
+### 직접 트랜잭션 추가
+
+```java
+@SpringBootTest
+public class ItemRepositoryTest {
+    @Autowired
+    PlatformTransactionManager transactionManager;
+    TransactionStatus status;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @BeforeEach
+    void beforeEach() {
+        // 트랜잭션 시작
+        this.status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+    }
+
+    @AfterEach
+    void afterEach() {
+        // 메모리 Repository 인 경우 제한적으로 사용
+        if (this.itemRepository instanceof MemoryItemRepository) {
+            ((MemoryItemRepository) this.itemRepository).clearStore();
+        }
+
+        // 트랜잭션 롤백
+        this.transactionManager.rollback(status);
+    }
+    
+    // ...
+}
+```
+
+* 트랜잭션 관리자는 `PlatformTransactionManager`를 주입 받아서 사용하면 된다.
+    * 참고로 스프링 부트는 자동으로 적절한 트랜잭션 매니저를 스프링 빈으로 등록해준다.
+    * 앞서 학습한 스프링 부트의 자동 리소스 등록 장을 떠올려보자.
+* `@BeforeEach`
+    * 각각의 테스트 케이스를 실행하기 직전에 호출된다.
+    * 따라서 여기서 트랜잭션을 시작하면 된다.
+    * 그러면 각각의 테스트를 트랜잭션 범위 안에서 실행할 수 있다.
+    * `transactionManager.getTransaction(new DefaultTransactionDefinition())`로 트랜잭션을 시작한다.
+* `@AfterEach`
+    * 각각의 테스트 케이스가 완료된 직후에 호출된다.
+    * 따라서 여기서 트랜잭션을 롤백하면 된다.
+    * 그러면 데이터를 트랜잭션 실행 전 상태로 복구할 수 있다.
+    * `transactionManager.rollback(status)`로 트랜잭션을 롤백한다.
+
 ## 테스트 - @Transaction
 
 ## 테스트 - 임베디드 모드 DB
