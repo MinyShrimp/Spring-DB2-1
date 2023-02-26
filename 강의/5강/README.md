@@ -196,3 +196,101 @@ public interface SpringDataJpaItemRepository extends JpaRepository<Item, Long> {
     * 파라미터 바인딩은 `@Param("itemName")` 애노테이션을 사용하고, 애노테이션의 값에 파라미터 이름을 주면 된다.
 
 ## 스프링 데이터 JPA 적용 2
+
+### JpaItemRepository V2
+
+```java
+@Repository
+@Transactional
+@RequiredArgsConstructor
+public class JpaItemRepositoryV2 implements ItemRepository {
+
+    private final SpringDataJpaItemRepository repository;
+
+    @Override
+    public Item save(Item item) {
+        return repository.save(item);
+    }
+
+    @Override
+    public void update(Long itemId, ItemUpdateDto updateParam) {
+        Item findItem = repository.findById(itemId).orElseThrow();
+        findItem.update(updateParam);
+    }
+
+    @Override
+    public Optional<Item> findById(Long id) {
+        return repository.findById(id);
+    }
+
+    @Override
+    public List<Item> findAll(ItemSearchCond cond) {
+        String itemName = cond.getItemName();
+        Integer maxPrice = cond.getMaxPrice();
+
+        if (StringUtils.hasText(itemName) && maxPrice != null) {
+            return repository.findItems("%" + itemName + "%", maxPrice);
+        } else if (StringUtils.hasText(itemName)) {
+            return repository.findByItemNameLike("%" + itemName + "%");
+        } else if (maxPrice != null) {
+            return repository.findByPriceLessThanEqual(maxPrice);
+        } else {
+            return repository.findAll();
+        }
+    }
+}
+```
+
+#### 의존관계와 구조
+
+* `ItemService`는 `ItemRepository`에 의존하기 때문에 `ItemService`에서 `SpringDataJpaItemRepository`를 그대로 사용할 수 없다.
+* 물론 `ItemService`가 `SpringDataJpaItemRepository`를 직접 사용하도록 코드를 고치면 되겠지만,
+  우리는 `ItemService`코드의 변경없이 `ItemService`가 `ItemRepository`에 대한 의존을 유지하면서 DI를 통해 구현 기술을 변경하고 싶다.
+
+#### 클래스 의존 관계
+
+![img_2.png](img_2.png)
+
+* `JpaItemRepositoryV2`는 `ItemRepository`를 구현한다.
+* 그리고 `SpringDataJpaItemRepository`를 사용한다.
+
+#### 런타임 의존 관계
+
+![img_3.png](img_3.png)
+
+* 런타임의 객체 의존관계는 다음과 같이 동작한다.
+    * `itemService` -> `jpaItemRepositoryV2` -> `springDataJpaItemRepository(프록시 객체)`
+* 이렇게 중간에서 `JpaItemRepository`가 어댑터 역할을 해준 덕분에
+  `ItemService`가 사용하는 `ItemRepository` 인터페이스를 그대로 유지할 수 있고
+  클라이언트인 `ItemService`의 코드를 변경하지 않아도 되는 장점이 있다.
+
+### 설정
+
+#### SpringDataJpaConfig
+
+```java
+@Configuration
+@RequiredArgsConstructor
+public class SpringDataJpaConfig {
+
+    private final SpringDataJpaItemRepository springDataJpaItemRepository;
+
+    @Bean
+    public ItemService itemService() {
+        return new ItemServiceV1(itemRepository());
+    }
+
+    @Bean
+    public ItemRepository itemRepository() {
+        return new JpaItemRepositoryV2(springDataJpaItemRepository);
+    }
+}
+```
+
+#### MainApplication
+
+```java
+@Import(SpringDataJpaConfig.class)
+@SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
+public class SpringDb2Application { ... }
+```
