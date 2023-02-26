@@ -139,8 +139,8 @@ dependencies {
 ```properties
 # MyBatis
 mybatis.type-aliases-package = hello.springdb2.domain
-logging.level.hello.springdb2.repository.mybatis = trace
 mybatis.configuration.map-underscore-to-camel-case = true
+logging.level.hello.springdb2.example.mybatis.repository = trace
 ```
 
 > main, test 둘다 적용해주자!
@@ -177,10 +177,6 @@ mybatis.configuration.map-underscore-to-camel-case = true
     * `select item_name as name`
 
 ## MyBatis 적용 1 - 기본
-
-### 소개
-
-XML에 작성한다는 점을 제외하고는 JDBC 반복을 줄여준다는 점에서 기존 JdbcTemplate과 거의 유사하다.
 
 ### 예제
 
@@ -393,6 +389,91 @@ and price &lt;= #{maxPrice}
 이 구문 안에서는 XML TAG가 단순 문자로 인식되기 때문에 `<if>`, `<where>` 등이 적용되지 않는다.
 
 ## MyBatis 적용 2 - 설정과 실행
+
+### 예제
+
+#### MyBatisItemRepository
+
+```java
+@Repository
+@RequiredArgsConstructor
+public class MyBatisItemRepository implements ItemRepository {
+    private final ItemMapper itemMapper;
+
+    @Override
+    public Item save(Item item) {
+        itemMapper.save(item);
+        return item;
+    }
+
+    @Override
+    public void update(
+            Long itemId,
+            ItemUpdateDto updateParam
+    ) {
+        itemMapper.update(itemId, updateParam);
+    }
+
+    @Override
+    public Optional<Item> findById(Long id) {
+        return itemMapper.findById(id);
+    }
+
+    @Override
+    public List<Item> findAll(ItemSearchCond cond) {
+        return itemMapper.findAll(cond);
+    }
+}
+```
+
+* `MyBatisItemRepository`는 단순히 `ItemMapper`에 기능을 위임한다.
+
+#### MyBatisConfig
+
+```java
+@Configuration
+@RequiredArgsConstructor
+public class MyBatisConfig {
+    private final ItemMapper itemMapper;
+
+    @Bean
+    public ItemService itemService() {
+        return new ItemServiceV1(itemRepository());
+    }
+
+    @Bean
+    public ItemRepository itemRepository() {
+        return new MyBatisItemRepository(itemMapper);
+    }
+}
+```
+
+* `MyBatisConfig`는 `ItemMapper`를 주입받고, 필요한 의존관계를 만든다.
+
+#### MainApplication
+
+```java
+//@Import(JdbcTemplateV3Config.class)
+@Import(MyBatisConfig.class)
+@SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
+public class SpringDb2Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringDb2Application.class, args);
+    }
+
+    @Bean
+    @Profile("local")
+    public TestDataInit testDataInit(
+            ItemRepository itemRepository
+    ) {
+        return new TestDataInit(itemRepository);
+    }
+}
+```
+
+* `@Import(MyBatisConfig.class)`
+    * 앞서 설정한 `MyBatisConfig.class`를 사용하도록 설정했다.
 
 ## MyBatis 적용 3 - 분석
 
