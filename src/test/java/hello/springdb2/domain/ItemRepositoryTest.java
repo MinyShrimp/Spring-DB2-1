@@ -5,32 +5,21 @@ import hello.springdb2.dto.ItemUpdateDto;
 import hello.springdb2.example.memory.repository.MemoryItemRepository;
 import hello.springdb2.repository.ItemRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 @SpringBootTest
 public class ItemRepositoryTest {
-    @Autowired
-    PlatformTransactionManager transactionManager;
-    TransactionStatus status;
 
     @Autowired
     private ItemRepository itemRepository;
-
-    @BeforeEach
-    void beforeEach() {
-        // 트랜잭션 시작
-        this.status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-    }
 
     @AfterEach
     void afterEach() {
@@ -38,9 +27,6 @@ public class ItemRepositoryTest {
         if (this.itemRepository instanceof MemoryItemRepository) {
             ((MemoryItemRepository) this.itemRepository).clearStore();
         }
-
-        // 트랜잭션 롤백
-        this.transactionManager.rollback(status);
     }
 
     @Test
