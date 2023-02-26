@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hello.springdb2.example.mybatis.repository.ItemMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into ITEM(ITEM_NAME, PRICE, QUANTITY)
+        values (#{itemName}, #{price}, #{quantity})
+    </insert>
+
+    <update id="update">
+        update ITEM
+        set ITEM_NAME = #{updateParam.itemName},
+            PRICE     = #{updateParam.price},
+            QUANTITY  = #{updateParam.quantity}
+        where ID = #{id}
+    </update>
+
+    <select id="findById" resultType="Item">
+        select ID, ITEM_NAME, PRICE, QUANTITY
+        from ITEM
+        where ID = #{id}
+    </select>
+
+    <select id="findAll" resultType="Item">
+        select ID, ITEM_NAME, PRICE, QUANTITY
+        from ITEM
+        <where>
+            <if test="itemName != null and itemName != ''">
+                and ITEM_NAME like concat('%', #{itemName}, '%')
+            </if>
+            <if test="maxPrice != null">
+                <!-- price <= #{maxPrice} -->
+                <!-- and price &lt;= #{maxPrice} -->
+                <![CDATA[
+                    and price <= #{maxPrice}
+                ]]>
+            </if>
+        </where>
+    </select>
+</mapper>
