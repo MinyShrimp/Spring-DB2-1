@@ -2,6 +2,20 @@
 
 ## 테스트 - 데이터베이스 연동
 
+### test/application.properties
+
+```properties
+# PROFILE
+spring.profiles.active = test
+
+# DataSource
+spring.datasource.url = jdbc:h2:tcp://localhost/~/test
+spring.datasource.username = sa
+
+# JdbcTemplate SQL Log
+logging.level.org.springframework.jdbc = debug
+```
+
 ## 테스트 - 데이터베이스 분리
 
 ## 테스트 - 데이터 롤백
