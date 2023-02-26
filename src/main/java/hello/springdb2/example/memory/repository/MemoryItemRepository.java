@@ -1,4 +1,4 @@
-package hello.springdb2.repository.memory;
+package hello.springdb2.example.memory.repository;
 
 import hello.springdb2.domain.Item;
 import hello.springdb2.dto.ItemSearchCond;

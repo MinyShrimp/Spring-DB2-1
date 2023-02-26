@@ -2,8 +2,8 @@ package hello.springdb2.domain;
 
 import hello.springdb2.dto.ItemSearchCond;
 import hello.springdb2.dto.ItemUpdateDto;
+import hello.springdb2.example.memory.repository.MemoryItemRepository;
 import hello.springdb2.repository.ItemRepository;
-import hello.springdb2.repository.memory.MemoryItemRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

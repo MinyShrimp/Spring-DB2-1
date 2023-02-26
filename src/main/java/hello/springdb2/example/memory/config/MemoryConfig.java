@@ -1,20 +1,14 @@
-package hello.springdb2.config;
+package hello.springdb2.example.memory.config;
 
+import hello.springdb2.example.memory.repository.MemoryItemRepository;
 import hello.springdb2.repository.ItemRepository;
-import hello.springdb2.repository.jdbctemplate.JdbcTemplateItemRepositoryV2;
 import hello.springdb2.service.ItemService;
 import hello.springdb2.service.ItemServiceV1;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
-
 @Configuration
-@RequiredArgsConstructor
-public class JdbcTemplateV2Config {
-    private final DataSource dataSource;
-
+public class MemoryConfig {
     @Bean
     public ItemService itemService() {
         return new ItemServiceV1(itemRepository());
@@ -22,6 +16,6 @@ public class JdbcTemplateV2Config {
 
     @Bean
     public ItemRepository itemRepository() {
-        return new JdbcTemplateItemRepositoryV2(dataSource);
+        return new MemoryItemRepository();
     }
 }

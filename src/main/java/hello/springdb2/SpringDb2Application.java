@@ -1,6 +1,6 @@
 package hello.springdb2;
 
-import hello.springdb2.config.JdbcTemplateV3Config;
+import hello.springdb2.example.jdbctemplate.config.JdbcTemplateV3Config;
 import hello.springdb2.repository.ItemRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

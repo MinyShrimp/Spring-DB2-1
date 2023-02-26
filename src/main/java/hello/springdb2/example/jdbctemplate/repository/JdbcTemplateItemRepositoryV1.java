@@ -1,4 +1,4 @@
-package hello.springdb2.repository.jdbctemplate;
+package hello.springdb2.example.jdbctemplate.repository;
 
 import hello.springdb2.domain.Item;
 import hello.springdb2.dto.ItemSearchCond;

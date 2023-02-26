@@ -1,7 +1,7 @@
-package hello.springdb2.config;
+package hello.springdb2.example.jdbctemplate.config;
 
+import hello.springdb2.example.jdbctemplate.repository.JdbcTemplateItemRepositoryV3;
 import hello.springdb2.repository.ItemRepository;
-import hello.springdb2.repository.jdbctemplate.JdbcTemplateItemRepositoryV3;
 import hello.springdb2.service.ItemService;
 import hello.springdb2.service.ItemServiceV1;
 import lombok.RequiredArgsConstructor;

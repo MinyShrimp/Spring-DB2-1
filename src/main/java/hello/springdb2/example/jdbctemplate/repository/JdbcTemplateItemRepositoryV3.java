@@ -1,4 +1,4 @@
-package hello.springdb2.repository.jdbctemplate;
+package hello.springdb2.example.jdbctemplate.repository;
 
 import hello.springdb2.domain.Item;
 import hello.springdb2.dto.ItemSearchCond;
@@ -46,7 +46,7 @@ public class JdbcTemplateItemRepositoryV3 implements ItemRepository {
         SqlParameterSource param = new BeanPropertySqlParameterSource(item);
         Number key = jdbcInsert.executeAndReturnKey(param);
         item.setId(key.longValue());
-        
+
         return item;
     }
 
