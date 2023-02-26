@@ -110,6 +110,72 @@ JdbcTemplate은 스프링에 내장된 기능이고, 별도의 설정없이 사�
 
 ## MyBatis 설정
 
+### 설정
+
+#### build.gradle
+
+```gradle
+dependencies {
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.1'
+}
+```
+
+다음과 같은 라이브러리가 추가된다.
+
+![img.png](img.png)
+
+* `mybatis-spring-boot-starter`
+    * MyBatis를 스프링 부트에서 편리하게 사용할 수 있게 시작하는 라이브러리
+* `mybatis-spring-boot-autoconfigure`
+    * MyBatis와 스프링 부트 설정 라이브러리
+* `mybatis-spring`
+    * MyBatis와 스프링을 연동하는 라이브러리
+* `mybatis`
+    * MyBatis 라이브러리
+
+#### application.properties
+
+```properties
+# MyBatis
+mybatis.type-aliases-package = hello.springdb2.domain
+logging.level.hello.springdb2.repository.mybatis = trace
+mybatis.configuration.map-underscore-to-camel-case = true
+```
+
+> main, test 둘다 적용해주자!
+
+* `mybatis.type-aliases-package`
+    * 마이바티스에서 타입 정보를 사용할 때는 패키지 이름을 적어주어야 하는데, 여기에 명시하면 패키지 이름을 생략할 수 있다.
+    * 지정한 패키지와 그 하위 패키지가 자동으로 인식된다.
+    * 여러 위치를 지정하려면 `,`, `;` 로 구분하면 된다.
+* `mybatis.configuration.map-underscore-to-camel-case = true`
+    * JdbcTemplate의 `BeanPropertyRowMapper`에서 처럼 언더바를 카멜로 자동 변경해주는 기능을 활성화 한다.
+    * 바로 다음에 설명하는 관례의 불일치 내용을 참고하자.
+    * 기본값은 false이다.
+* `logging.level.hello.itemservice.repository.mybatis = trace`
+    * MyBatis에서 실행되는 쿼리 로그를 확인할 수 있다.
+
+#### 관례의 불일치
+
+자바 객체에는 주로 카멜(`camelCase`) 표기법을 사용한다.
+`itemName`처럼 중간에 낙타 봉이 올라와 있는 표기법이다.
+
+반면에 관계형 데이터베이스에서는 주로 언더스코어를 사용하는 `snake_case`표기법을 사용한다.
+`item_name`처럼 중간에 언더스코어를 사용하는 표기법이다.
+
+이렇게 관례로 많이 사용하다 보니 `map-underscore-to-camel-case` 기능을 활성화 하면 언더스코어 표기법을 카멜로 자동 변환해준다.
+따라서 DB에서 `select item_name`으로 조회해도 객체의 `itemName ( setItemName() )` 속성에 값이 정상 입력된다.
+
+정리하면 해당 옵션을 켜면 `snake_case`는 자동으로 해결되니 그냥 두면 되고,
+컬럼 이름과 객체 이름이 완전히 다른 경우에는 조회 SQL에서 별칭을 사용하면 된다.
+
+* 표기법 차이
+    * DB: `select item_name`
+    * 객체:  `name`
+* 별칭을 통한 해결방안
+    * `select item_name as name`
+
 ## MyBatis 적용 1 - 기본
 
 ## MyBatis 적용 2 - 설정과 실행
