@@ -25,6 +25,7 @@
 * JdbcTemplate - 이름 지정 파라미터 3
 * JdbcTemplate - SimpleJdbcInsert
 * JdbcTemplate 기능 정리
+* 정리
 
 ## 데이터 접근 기술 - 테스트
 
