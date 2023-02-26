@@ -724,3 +724,141 @@ with: [
 ```
 
 ## JdbcTemplate 기능 정리
+
+### 주요 기능
+
+* `JdbcTemplate`
+    * 순서 기반 파라미터 바인딩을 지원한다.
+* `NamedParameterJdbcTemplate`
+    * 이름 기반 파라미터 바인딩을 지원한다. (권장)
+* `SimpleJdbcInsert`
+    * INSERT SQL을 편리하게 사용할 수 있다.
+* `SimpleJdbcCall`
+    * 스토어드 프로시저를 편리하게 호출할 수 있다.
+
+> 참고
+> 스토어드 프로시저를 사용하기 위한 `SimpleJdbcCall`에 대한 자세한 내용은 다음 스프링 공식 메뉴얼을 참고하자.
+> * [공식 Docs](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#jdbc-simple-jdbc-call-1)
+
+### JdbcTemplate 사용법 정리
+
+> [공식 Docs](https://docs.spring.io/spring-framework/docs/current/reference/html/data-access.html#jdbc-JdbcTemplate)
+
+JdbcTemplate에 대한 사용법은 스프링 공식 메뉴얼에 자세히 소개되어 있다.
+여기서는 스프링 공식 메뉴얼이 제공하는 예제를 통해 JdbcTemplate의 기능을 간단히 정리해보자.
+
+### 조회
+
+#### 단건 조회 - 숫자
+
+```java
+int rowCount = jdbcTemplate.queryForObject("select count(*) from t_actor", Integer.class);
+```
+
+#### 단건 조회 - 숫자, 파라미터 바인딩
+
+```java
+int countOfActorsNamedJoe = jdbcTemplate.queryForObject(
+        "select count(*) from t_actor where first_name = ?", Integer.class, "Joe"
+);
+```
+
+#### 단건 조회 - 문자
+
+```java
+String lastName = jdbcTemplate.queryForObject(
+        "select last_name from t_actor where id = ?", String.class, 1212L
+);
+```
+
+#### 단건 조회 - 객체
+
+```java
+Actor actor = jdbcTemplate.queryForObject(
+        "select first_name, last_name from t_actor where id = ?",
+        (resultSet, rowNum) -> {
+            Actor newActor = new Actor();
+            newActor.setFirstName(resultSet.getString("first_name"));
+            newActor.setLastName(resultSet.getString("last_name"));
+            return newActor;
+        },
+        1212L
+);
+```
+
+#### 목록 조회 - 객체
+
+```java
+List<Actor> actors = this.jdbcTemplate.query(
+        "select first_name, last_name from t_actor",
+        (resultSet, rowNum) -> {
+            Actor actor = new Actor();
+            actor.setFirstName(resultSet.getString("first_name"));
+            actor.setLastName(resultSet.getString("last_name"));
+            return actor;
+        }
+);
+```
+
+#### 목록 조회 - 객체
+
+```java
+private final RowMapper<Actor> actorRowMapper = (resultSet, rowNum) -> {
+    Actor actor = new Actor();
+    actor.setFirstName(resultSet.getString("first_name"));
+    actor.setLastName(resultSet.getString("last_name"));
+    return actor;
+};
+
+public List<Actor> findAllActors() {
+    return this.jdbcTemplate.query("select first_name, last_name from t_actor", actorRowMapper);
+}
+```
+
+### 변경
+
+#### 등록
+
+```java
+this.jdbcTemplate.update(
+        "insert into t_actor (first_name, last_name) values (?, ?)",
+        "Leonor", "Watling"
+);
+```
+
+#### 수정
+
+```java
+this.jdbcTemplate.update(
+        "update t_actor set last_name = ? where id = ?",
+        "Banjo", 5276L
+);
+```
+
+#### 삭제
+
+```java
+this.jdbcTemplate.update(
+        "delete from t_actor where id = ?",
+        Long.valueOf(actorId)
+);
+```
+
+### 기타 기능
+
+#### DDL
+
+```java
+this.jdbcTemplate.execute("create table mytable (id integer, name varchar(100))");
+```
+
+#### 스토어드 프로시저
+
+```java
+this.jdbcTemplate.update(
+        "call SUPPORT.REFRESH_ACTORS_SUMMARY(?)",
+        Long.valueOf(unionId)
+);
+```
+
+## 정리
