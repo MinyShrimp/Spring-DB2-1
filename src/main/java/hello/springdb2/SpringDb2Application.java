@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 @Import(MemoryConfig.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
 public class SpringDb2Application {
 
     public static void main(String[] args) {
