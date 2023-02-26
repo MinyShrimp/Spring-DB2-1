@@ -315,6 +315,76 @@ select id, item_name, price, quantity from item
 
 ## JdbcTemplate 적용 3 - 구성과 실행
 
+### 예제
+
+#### JdbcTemplateV1Config
+
+```java
+@Configuration
+@RequiredArgsConstructor
+public class JdbcTemplateV1Config {
+    private final DataSource dataSource;
+
+    @Bean
+    public ItemService itemService() {
+        return new ItemServiceV1(itemRepository());
+    }
+
+    @Bean
+    public ItemRepository itemRepository() {
+        return new JdbcTemplateItemRepositoryV1(dataSource);
+    }
+}
+```
+
+#### MainApplication
+
+```java
+//@Import(MemoryConfig.class)
+@Import(JdbcTemplateV1Config.class)
+@SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
+public class SpringDb2Application { ... }
+```
+
+#### application.properties
+
+```properties
+# PROFILE
+spring.profiles.active = local
+
+# DataSource
+spring.datasource.url = jdbc:h2:tcp://localhost/~/test
+spring.datasource.username = sa
+```
+
+* 이렇게 설정만 하면 스프링 부트가 해당 설정을 사용해서 커넥션 풀과 `DataSource`, `트랜잭션 매니저`를 스프링 빈으로 자동 등록한다.
+
+#### 결과
+
+```
+HikariPool-1 - Starting...
+HikariPool-1 - Added connection conn0: url=jdbc:h2:tcp://localhost/~/test user=SA
+HikariPool-1 - Start completed.
+```
+
+### 로그 추가
+
+```properties
+# JdbcTemplate SQL Log
+logging.level.org.springframework.jdbc = debug
+```
+
+* `JdbcTemplate`이 실행하는 SQL 로그를 확인하려면 `application.properties`에 다음을 추가하면 된다.
+* `main`, `test`설정이 분리되어 있기 때문에 둘다 확인하려면 두 곳에 모두 추가해야 한다.
+
+#### 결과
+
+```
+Executing prepared SQL query
+Executing prepared SQL statement [select id, item_name, price, quantity from item where id = ?]
+Fetching JDBC Connection from DataSource
+```
+
 ## JdbcTemplate - 이름 지정 파라미터 1
 
 ## JdbcTemplate - 이름 지정 파라미터 2
