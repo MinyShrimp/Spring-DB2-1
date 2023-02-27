@@ -27,11 +27,17 @@ dependencies {
     // JdbcTemplate
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
+    // MyBatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.1'
+
     // JPA, 스프링 데이터 JPA 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // MyBatis
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.1'
+    // QueryDSL 추가 1 - 의존성
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
     // H2 데이터베이스
     runtimeOnly 'com.h2database:h2'
@@ -47,4 +53,9 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+//Querydsl 추가 2
+clean {
+    delete file('src/main/generated')
 }
