@@ -3,6 +3,7 @@
 * 강의 : [김영한님의 스프링 DB 2편 - 데이터 접근 활용 기술](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81-db-2/dashboard)
 * 깃헙
     * https://github.com/MinyShrimp/Spring-DB2-1
+    * https://github.com/MinyShrimp/Spring-DB2-2
 
 ## [데이터 접근 기술 - 시작](강의/0강)
 
@@ -79,9 +80,3 @@
 * 실용적인 구조
 * 다양한 데이터 접근 기술 조합
 * 정리
-
-## 스프링 트랜잭션 이해
-
-## 스프링 트랜잭션 전파 1 - 기본
-
-## 스프링 트랜잭션 전파 2 - 활용
