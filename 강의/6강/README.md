@@ -175,3 +175,20 @@ public class QueryDslConfig {
 @SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
 public class SpringDb2Application { ... }
 ```
+
+## 정리
+
+### Querydsl 장점
+
+* 쿼리 문장에 오타가 있어도 컴파일 시점에 오류를 막을 수 있다.
+* 메서드 추출을 통해서 코드를 재사용할 수 있다.
+    * 예를 들어서 여기서 만든 `likeItemName(itemName)`, `maxPrice(maxPrice)` 메서드를 다른 쿼리에서도 함께 사용할 수 있다.
+
+Querydsl을 사용해서 자바 코드로 쿼리를 작성하는 장점을 느껴보았을 것이다.
+그리고 동적 쿼리 문제도 깔끔하게 해결해보았다.
+
+Querydsl은 이 외에도 수 많은 편리한 기능을 제공한다.
+예를 들어서 최적의 쿼리 결과를 만들기 위해서 DTO로 편리하게 조회하는 기능은 실무에서 자주 사용하는 기능이다.
+JPA를 사용한다면 스프링 데이터 JPA와 Querydsl은 실무의 다양한 문제를 편리하게 해결하기 위해 선택하는 기본 기술이라 생각한다.
+
+Querydsl에 대한 자세한 내용은 실전! Querydsl 강의를 참고하자

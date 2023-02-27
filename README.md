@@ -71,6 +71,7 @@
 * Querydsl 소개 2 - 해결
 * Querydsl 설정
 * Querydsl 적용
+* 정리
 
 ## 데이터 접근 기술 - 활용 방안
 
