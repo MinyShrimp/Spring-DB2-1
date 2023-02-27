@@ -1,6 +1,6 @@
 package hello.springdb2;
 
-import hello.springdb2.example.springdatajpa.config.SpringDataJpaConfig;
+import hello.springdb2.example.qeurydsl.config.QueryDslConfig;
 import hello.springdb2.repository.ItemRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-@Import(SpringDataJpaConfig.class)
+@Import(QueryDslConfig.class)
 @SpringBootApplication(scanBasePackages = "hello.springdb2.controller")
 public class SpringDb2Application {
 
